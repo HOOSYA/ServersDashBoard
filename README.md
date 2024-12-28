@@ -107,6 +107,5 @@ sudo systemctl start status_dashboard.service
    sudo sensors-detect
    ```
    Следуйте инструкциям для обнаружения поддерживаемых датчиков.
-```
 
 
