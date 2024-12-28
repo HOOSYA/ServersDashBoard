@@ -20,6 +20,8 @@ JavaScript для динамической смены тем и обновлен
 Стандарты CSS для стилизации интерфейса.
 Проект может быть легко расширен, добавляя новые метрики или улучшая интерфейс.﻿# StatusServer
 
-![Снимок экрана 2024-12-27 055852](https://github.com/user-attachments/assets/b0f33820-424b-4353-b58e-6e779dd4e14d)
-![Снимок экрана 2024-12-27 055913](https://github.com/user-attachments/assets/6a63f671-81d9-4fba-a565-a0c754c9df8f)
+![image](https://github.com/user-attachments/assets/b72e750d-ba7c-40ef-b5d2-45678704e4e5)
+![image](https://github.com/user-attachments/assets/0e1dd5f5-3c1d-4cec-9124-2427940627dc)
+
+
 
