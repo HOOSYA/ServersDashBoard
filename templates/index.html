@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛠 Статус серверов</title>
+    <style>
+        /* Определение переменных для светлой и тёмной темы */
+        :root {
+            --background-color-light: #f4f4f4;
+            --background-color-dark: #2f3542;  /* Тёмно-серый фон */
+            --card-background-light: #ffffff;
+            --card-background-dark: #b0bec5;   /* Светло-серый фон для карточек в тёмной теме */
+            --text-color-light: #2c3e50;
+            --text-color-dark: #ecf0f1;
+            --button-background: #2c3e50;
+            --button-text: #ffffff;
+            --button-hover-background: #34495e;
+            --pre-background-light: #ecf0f1;
+            --pre-background-dark: #cfd8dc; /* Светло-серый фон для блоков pre в тёмной теме */
+            --pre-text-light: #2c3e50;
+            --pre-text-dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Arial', Helvetica, sans-serif;
+            background-color: var(--background-color-light);
+            color: var(--text-color-light);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body[data-theme='dark'] {
+            background-color: var(--background-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        /* Фиксированный хедер */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--background-color-light);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body[data-theme='dark'] .header {
+            background-color: var(--background-color-dark);
+        }
+
+        .time-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+            color: var(--text-color-light);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        body[data-theme='dark'] .header h1 {
+            color: var(--text-color-dark);
+        }
+
+        .buttons-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 30px;
+        }
+
+        .github-button,
+        .update-button,
+        .theme-switch {
+            background-color: var(--button-background);
+            color: var(--button-text);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .github-button:hover,
+        .update-button:hover,
+        .theme-switch:hover {
+            background-color: var(--button-hover-background);
+        }
+
+        .github-button {
+            text-decoration: none;
+        }
+
+        .update-button:active,
+        .theme-switch:active {
+            transform: scale(0.95);
+        }
+
+        .server-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 90%;
+            max-width: 800px;
+            margin: 80px auto 0; /* Добавляем отступ для фиксированного хедера */
+        }
+
+        .server {
+            background-color: var(--card-background-light);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background-color 0.3s;
+        }
+
+        body[data-theme='dark'] .server {
+            background-color: var(--card-background-dark);
+        }
+
+        pre {
+            background-color: var(--pre-background-light);
+            color: var(--pre-text-light);
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 5px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        body[data-theme='dark'] pre {
+            background-color: var(--pre-background-dark);
+            color: var(--pre-text-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- Фиксированный хедер -->
+    <div class="header">
+        <div class="time-display" id="time-display">--:--:--</div>
+        <h1>🛠 Информационная панель 🛠</h1>
+        <div class="buttons-container">
+            <button class="update-button" onclick="window.location.reload();">🔄</button>
+            <button class="theme-switch" id="theme-switch">🌔</button>
+        </div>
+    </div>
+
+    <!-- Контейнер с данными о серверах -->
+    <div class="server-container" id="server-container">
+        {% for server, data in data_store.items() %}
+        <div class="server" id="server-{{ server }}">
+            <h2>IP: {{ server }}</h2>
+            <p><strong>Время работы:</strong></p>
+            <pre id="uptime-{{ server }}">{{ data['uptime'] }}</pre>
+            <p><strong>Использование RAM:</strong></p>
+            <pre id="memory-{{ server }}">{{ data['memory'] }}</pre>
+            <p><strong>Процессор:</strong></p>
+            <pre id="cpu_usage-{{ server }}">{{ data['cpu_usage'] }}</pre>
+            <p><strong>Температура:</strong></p>
+            <pre id="temperature-{{ server }}">{{ data['temperature'] }}</pre>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Подключение Socket.IO -->
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.0.1/dist/socket.io.min.js"></script>
+    <script>
+        const themeSwitch = document.getElementById('theme-switch');
+        const body = document.body;
+
+        // Проверка сохраненной темы в localStorage, если нет - устанавливаем светлую
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+
+        themeSwitch.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        const updateTime = () => {
+            const now = new Date();
+            document.getElementById('time-display').textContent = now.toLocaleTimeString();
+        };
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        const socket = io.connect('http://localhost:3500');
+        socket.on('server_update', (data) => {
+            for (const server in data) {
+                const serverData = data[server];
+                document.getElementById(`uptime-${server}`).textContent = serverData.uptime;
+                document.getElementById(`memory-${server}`).textContent = serverData.memory;
+                document.getElementById(`cpu_usage-${server}`).textContent = serverData.cpu_usage;
+                document.getElementById(`temperature-${server}`).textContent = serverData.temperature;
+            }
+        });
+    </script>
+</body>
+</html>
